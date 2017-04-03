@@ -1,6 +1,11 @@
 #include <string>
 #include <iostream>
 #include <functional>
+#include <random>
+#include <queue>
+#include <array>
+#include <unordered_set>
+#include <algorithm>
 
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
@@ -35,7 +40,7 @@ void GaussianMethod(cv::Mat &img)
 	cv::imshow("thresholded image"s, threshold);
 }
 
-void ErosionMethod(cv::Mat &img)
+auto ErosionMethod(cv::Mat &img)
 {
 	auto kernel = cv::Mat::ones(10, 10, CV_8U);
 	cv::Mat eroded;
@@ -44,19 +49,106 @@ void ErosionMethod(cv::Mat &img)
 	cv::Mat thresholded;
 	cv::threshold(eroded, thresholded, 100, 255, cv::THRESH_BINARY);
 	cv::imshow("Eroded image"s, thresholded);
+	return thresholded;
+}
+
+bool inline pointInImage(const cv::Point& p, const cv::Mat& img)
+{
+	return (p.x < img.cols && p.x >= 0 && p.y < img.rows && p.y >= 0);
+}
+
+std::array<cv::Point, 8> inline getNeighbors(const cv::Point& p, int dist)
+{
+	return { cv::Point(p.x + dist, p.y),
+			 cv::Point(p.x - dist, p.y),
+			 cv::Point(p.x + dist, p.y + dist),
+			 cv::Point(p.x + dist, p.y - dist),
+			 cv::Point(p.x - dist, p.y + dist),
+			 cv::Point(p.x - dist, p.y - dist),
+			 cv::Point(p.x, p.y + dist),
+			 cv::Point(p.x, p.y - dist) };
+}
+
+std::size_t point_hash(const cv::Point& p)
+{
+	return std::hash<int>()(p.x) ^ std::hash<int>()(p.y);
+}
+
+using Region = std::unordered_set<cv::Point, decltype(&point_hash)>;
+
+auto getRegionFromPoint(const cv::Point& currentPoint, const cv::Mat& source, cv::Mat& dest)
+{
+	auto currentColor = source.at<unsigned char>(currentPoint);
+
+	std::queue<cv::Point> pointsToVisit;
+	pointsToVisit.push(currentPoint);
+
+	Region visited(source.size().area(), point_hash);
+	while (!pointsToVisit.empty())
+	{
+		auto current = pointsToVisit.front();
+		pointsToVisit.pop();
+		if (visited.find(current) == visited.end())
+		{
+			visited.insert(current);
+			auto currentPixel = source.at<unsigned char>(current);
+			if (currentPixel == currentColor)
+			{
+				dest.at<unsigned char>(current) = 0xFF;
+				auto nearNeighbors = getNeighbors(current, 1);
+				for (const auto& p : nearNeighbors)
+				{
+					dest.at<unsigned char>(p) = 0xFF;
+				}
+
+				auto neighbors = getNeighbors(current, 3);
+				for (const auto& p : neighbors)
+				{
+					if (pointInImage(p, source))
+					{
+						pointsToVisit.push(p);
+					}
+				}
+			}
+		}
+	}
+
+	return visited;
 }
 
 int main()
 {
 	auto original = cv::imread("test.jpg"s, cv::IMREAD_GRAYSCALE);
 	auto img = cv::Mat();
-	cv::resize(original, img, cv::Size(original.size().width / 4, original.size().height / 4), 0, 0, CV_INTER_AREA);
+	cv::resize(original, img, cv::Size(original.size().width / 5, original.size().height / 5), 0, 0, CV_INTER_AREA);
 	cv::imshow("Scaled down image"s, img);
 
 	//GaussianMethod(img);
 
-	ErosionMethod(img);
+	img = ErosionMethod(img);
+
+	/*auto highlighted = cv::Mat(img.size(), CV_8U);
+	highlighted = cv::Scalar(0.0);
 	
+	std::random_device randomDevice;
+	std::uniform_int_distribution<int> dist(0, std::min(size.width, size.height));
+	
+	auto randX = dist(randomDevice);
+	auto randY = dist(randomDevice);
+	auto currentPoint = cv::Point(randX, randY);
+	if (img.at<unsigned char>(currentPoint) == 0x00)
+	{
+		getRegionFromPoint(currentPoint, img, highlighted);
+	}
+*/
+	cv::Mat contourImg(img.size(), CV_8U, cv::Scalar(0.0));
+	std::vector<cv::Mat> contours;
+	cv::findContours(img, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+	std::nth_element(contours.begin(), contours.begin() + 1, contours.end(), [](const auto& c1, const auto& c2) {return c1.cols * c1.rows > c2.cols * c2.rows; });
+	
+	cv::drawContours(contourImg, contours, 1, cv::Scalar(255.0));
+
+	cv::imshow("Largest region", contourImg);
 	cv::waitKey();
 	return 0;
 }
