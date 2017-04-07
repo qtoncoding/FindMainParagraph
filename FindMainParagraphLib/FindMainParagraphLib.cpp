@@ -51,7 +51,7 @@ void FindMainParagraphLib::FindMainParagraph::calculate(int kernelSize, int lowT
 	cv::Mat img;
 	cv::cvtColor(m_srcImg, img, CV_RGBA2GRAY);
 
-	m_erodedImg = cv::Mat(img.size(), m_srcImg.type());
+	m_erodedImg = cv::Mat::zeros(img.size(), m_srcImg.type());
 	img = ErosionMethod(img, kernelSize, lowThreshold, highThreshold);
 	m_srcImg.copyTo(m_erodedImg, img);
 
@@ -66,17 +66,16 @@ void FindMainParagraphLib::FindMainParagraph::calculate(int kernelSize, int lowT
 
 
 	auto colorStep = 255.0 / m_contours.size();
-	m_regionsImg = cv::Mat(img.size(), CV_8U);
-	m_regionsImg = cv::Scalar(0.0);
+	m_regionsImg = cv::Mat::zeros(img.size(), CV_8U);
 	for (auto i = 0u; i < m_contours.size(); ++i)
 	{
 		cv::drawContours(m_regionsImg, m_contours, i, cv::Scalar(colorStep * (i + 1)), CV_FILLED);
 	}
 
-	m_contourImg = cv::Mat(img.size(), CV_8U);
+	m_contourImg = cv::Mat::zeros(img.size(), CV_8U);
 	m_contourImg = cv::Scalar(0.0);
 	cv::drawContours(m_contourImg, m_contours, 1, cv::Scalar(255.0), CV_FILLED);
 
-	m_finalImg = cv::Mat(img.size(), m_srcImg.type());
+	m_finalImg = cv::Mat::zeros(img.size(), m_srcImg.type());
 	m_srcImg.copyTo(m_finalImg, m_contourImg);
 }

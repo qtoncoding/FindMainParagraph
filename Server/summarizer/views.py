@@ -15,7 +15,8 @@ class AnalysisRunView(APIView):
     def post(self, request):
         print(request.data['content'] + "\n\n")
 
-        corrected_text = spell_correct("proof", request.data['content'], 0.7)
+        #corrected_text = spell_correct("proof", request.data['content'], 0.7)
+        corrected_text = request.data['content']
         print(corrected_text + "\n\n")
 
         summary = extract_summary(corrected_text)
