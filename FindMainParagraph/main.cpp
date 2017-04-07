@@ -45,10 +45,11 @@ auto ErosionMethod(cv::Mat &img)
 	auto kernel = cv::Mat::ones(10, 10, CV_8U);
 	cv::Mat eroded;
 	cv::erode(img, eroded, kernel, cv::Point(-1, -1), 2);
+	cv::imshow("eroded image"s, eroded);
 
 	cv::Mat thresholded;
 	cv::threshold(eroded, thresholded, 100, 255, cv::THRESH_BINARY);
-	cv::imshow("Eroded image"s, thresholded);
+	cv::imshow("thresholded image"s, thresholded);
 	return thresholded;
 }
 
@@ -123,10 +124,9 @@ int main()
 	cv::resize(original, img, cv::Size(original.size().width / 5, original.size().height / 5), 0, 0, CV_INTER_AREA);
 	cv::imshow("Scaled down image"s, img);
 
-	//GaussianMethod(img);
+	GaussianMethod(img);
 
-	img = ErosionMethod(img);
-
+	auto eroded = ErosionMethod(img);
 	/*auto highlighted = cv::Mat(img.size(), CV_8U);
 	highlighted = cv::Scalar(0.0);
 	
@@ -141,14 +141,39 @@ int main()
 		getRegionFromPoint(currentPoint, img, highlighted);
 	}
 */
-	cv::Mat contourImg(img.size(), CV_8U, cv::Scalar(0.0));
-	std::vector<cv::Mat> contours;
-	cv::findContours(img, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
-	std::nth_element(contours.begin(), contours.begin() + 1, contours.end(), [](const auto& c1, const auto& c2) {return c1.cols * c1.rows > c2.cols * c2.rows; });
-	
-	cv::drawContours(contourImg, contours, 1, cv::Scalar(255.0));
+	cv::Mat contoursImg(eroded.size(), CV_8U, cv::Scalar(0.0));
+	cv::Mat contourImg(eroded.size(), CV_8U, cv::Scalar(0.0));
 
-	cv::imshow("Largest region", contourImg);
+	std::vector<cv::Mat> contours;
+	cv::findContours(eroded, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+
+	std::nth_element(contours.begin(), 
+					 contours.begin() + 1, 
+					 contours.end(), 
+					 [](const auto& c1, const auto& c2) 
+					 {
+						return c1.cols * c1.rows > c2.cols * c2.rows; 
+					 });
+	
+	auto colorStep = 255.0 / contours.size();
+
+	for (auto i = 0u; i < contours.size(); ++i)
+	{
+		cv::drawContours(contoursImg, contours, i, cv::Scalar(colorStep * (i+1)), CV_FILLED);
+
+	}
+
+	cv::imshow("Contours", contoursImg);
+
+	cv::drawContours(contourImg, contours, 1, cv::Scalar(255.0), CV_FILLED);
+	
+	cv::imshow("Contour", contourImg);
+
+	cv::Mat finalImg;
+	img.copyTo(finalImg, contourImg);
+	
+	cv::imshow("Final image", finalImg);
+	
 	cv::waitKey();
 	return 0;
 }

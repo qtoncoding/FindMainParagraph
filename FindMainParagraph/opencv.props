@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <OPENCV_DIR>F:\opencv\build\x64\vc14</OPENCV_DIR>
+    <OPENCV_DIR>C:\opencv\build\x64\vc14</OPENCV_DIR>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
