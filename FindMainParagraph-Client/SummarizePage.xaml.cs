@@ -78,6 +78,7 @@ namespace FindMainParagraph_Client
                 }
 
                 BrowseButton.Visibility = Visibility.Collapsed;
+                SummarizeButton.IsEnabled = true;
             }
         }
 
@@ -91,6 +92,8 @@ namespace FindMainParagraph_Client
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
+            ProgressBar.Visibility = Visibility.Visible;
+
             var ocrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
             var originalResult = await ocrEngine.RecognizeAsync(originalBitmap);
             var finalResult = await ocrEngine.RecognizeAsync(finalBitmap);
@@ -107,6 +110,9 @@ namespace FindMainParagraph_Client
             {
                 Summarization.Text = originalSummarizedText;
             }
+
+            ProgressBar.Visibility = Visibility.Collapsed;
+            SummarizeButton.IsEnabled = false;
         }
 
         private static async Task<string> getSummarizedText(OcrResult originalResult, HttpClient client)

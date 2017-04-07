@@ -21,11 +21,12 @@
         <Image x:Name="Original" Grid.ColumnSpan="2" Grid.Row="0" Stretch="UniformToFill" Margin="5, 5, 5, 5"/>
         <Button x:Name="BrowseButton" Content ="Browse..." Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Click="BrowseButton_Click" />
 
+        <ProgressBar x:Name="ProgressBar" Grid.Column="1" Grid.Row="1" Margin="5, 5, 5, 5" IsIndeterminate="True" Visibility="Collapsed"/>
         <TextBlock x:Name="Summarization" Grid.Column="1" Grid.Row="1" Margin="5, 5, 5, 5" TextWrapping="WrapWholeWords" />
 
         <StackPanel Grid.Row="1" Grid.Column="0" >
             <ToggleSwitch x:Name="ParagraphSwitch" OnContent="Find main paragraph" OffContent="Original image" Margin="5, 0, 0, 0" Toggled="ParagraphSwitch_Toggled"/>
-            <Button Content="Summarize" Click="Button_Click" Margin="5, 0, 0, 5"/>
+            <Button x:Name="SummarizeButton" Content="Summarize" Click="Button_Click" Margin="5, 0, 0, 5"  IsEnabled="False"/>
         </StackPanel>
     </Grid>
 </Page>
