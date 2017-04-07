@@ -26,6 +26,15 @@
 
         <StackPanel Grid.Row="1" Grid.Column="0" >
             <ToggleSwitch x:Name="ParagraphSwitch" OnContent="Find main paragraph" OffContent="Original image" Margin="5, 0, 0, 0" Toggled="ParagraphSwitch_Toggled"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Kernel Size"  Grid.Column="0" Margin="5, 5, 5, 5" VerticalAlignment="Center"/>
+                <TextBox x:Name="KernelSizeText" IsEnabled="False" Text="30" Grid.Column="1" Margin="5, 5, 5, 5" InputScope="AlphanumericPin" />
+            </Grid>
+            <Button x:Name="RecalculateButton" Content="Recalculate" IsEnabled="False" Click="RecalculateButton_Click" Margin="5, 0, 0, 5" />
             <Button x:Name="SummarizeButton" Content="Summarize" Click="Button_Click" Margin="5, 0, 0, 5"  IsEnabled="False"/>
         </StackPanel>
     </Grid>

@@ -39,6 +39,7 @@ namespace FindMainParagraph_Client
         private string finalSummarizedText = null;
         private SoftwareBitmapSource originalSource = null;
         private SoftwareBitmapSource finalSource = null;
+        private FindMainParagraph findMainParagraph;
 
         public SummarizePage()
         {
@@ -64,7 +65,7 @@ namespace FindMainParagraph_Client
                 }
                 originalSource = await GetBitmapSourceAsync(originalBitmap);
 
-                var findMainParagraph = new FindMainParagraph(originalBitmap);
+                findMainParagraph = new FindMainParagraph(originalBitmap);
                 finalBitmap = findMainParagraph.FinalImage();
                 finalSource = await GetBitmapSourceAsync(finalBitmap);
 
@@ -79,6 +80,8 @@ namespace FindMainParagraph_Client
 
                 BrowseButton.Visibility = Visibility.Collapsed;
                 SummarizeButton.IsEnabled = true;
+                RecalculateButton.IsEnabled = true;
+                KernelSizeText.IsEnabled = true;
             }
         }
 
@@ -172,6 +175,17 @@ namespace FindMainParagraph_Client
                 }
             }
 
+        }
+
+        private async void RecalculateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (KernelSizeText.Text != string.Empty)
+            {
+                var kernelSize = int.Parse(KernelSizeText.Text);
+                findMainParagraph.Recalculate(kernelSize, 100, 255);
+                finalBitmap = findMainParagraph.FinalImage();
+                finalSource = await GetBitmapSourceAsync(finalBitmap);
+            }
         }
     }
 }
