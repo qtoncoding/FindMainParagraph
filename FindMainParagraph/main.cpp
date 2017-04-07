@@ -7,8 +7,8 @@
 #include <unordered_set>
 #include <algorithm>
 
-#include <opencv2\highgui\highgui.hpp>
-#include <opencv2\imgproc\imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "main.h"
 
 using namespace std::string_literals;

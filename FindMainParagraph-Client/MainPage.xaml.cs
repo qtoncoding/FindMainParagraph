@@ -25,6 +25,8 @@ namespace FindMainParagraph_Client
         public MainPage()
         {
             this.InitializeComponent();
+
+            HamburgerMenu.ItemsSource = HamburgerMenuItem.GetMenuItems();
         }
 
         private void HamburgerMenu_ItemClick(object sender, ItemClickEventArgs e)

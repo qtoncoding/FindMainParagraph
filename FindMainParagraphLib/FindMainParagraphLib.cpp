@@ -7,7 +7,7 @@
 
 FindMainParagraphLib::FindMainParagraph::FindMainParagraph(const cv::Mat& img) : m_srcImg(img)
 {
-	calculate(30, 100, 255);
+	calculate(40, 100, 255);
 }
 
 cv::Mat FindMainParagraphLib::FindMainParagraph::FinalImage() const
@@ -69,7 +69,9 @@ void FindMainParagraphLib::FindMainParagraph::calculate(int kernelSize, int lowT
 	{
 		cv::drawContours(m_regionsImg, m_contours, i, cv::Scalar(colorStep * (i + 1)), CV_FILLED);
 	}
-	
+
+	m_contourImg = cv::Mat(img.size(), CV_8U);
+	m_contourImg = cv::Scalar(0.0);
 	cv::drawContours(m_contourImg, m_contours, 1, cv::Scalar(255.0), CV_FILLED);
 
 	m_srcImg.copyTo(m_finalImg, m_contourImg);
